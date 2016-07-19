@@ -6,20 +6,21 @@ import cz.cvut.fel.ida.reads.readsIDA2016.model.ReadsBag;
 import cz.cvut.fel.ida.reads.readsIDA2016.model.Sequence;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
+
 /**
  * @author Petr Ryšavý
  */
-public class MongeElkanSimilarityTest {
+public class MongeElkanDistanceTest {
 
     @Test
-    public void testGetSimilarity() {
+    public void testGetDistance() {
         MongeElkanDistance instance = new MongeElkanDistance<>((Double a, Double b) -> 1.0 - Math.exp(-Math.abs(a - b)));
         Multiset<Double> a = new HashMultiset<>(1.0, 2.0, 3.0, 2.0, 5.0);
         Multiset<Double> b = new HashMultiset<>(1.0, 1.0, 2.5);
@@ -27,7 +28,7 @@ public class MongeElkanSimilarityTest {
     }
 
     @Test
-    public void testGetSimilarity2() {
+    public void testGetDistance2() {
         MongeElkanDistance instance = new MongeElkanDistance<>((Double a, Double b) -> 1.0 - Math.exp(-Math.abs(a - b)));
         Multiset<Double> a = new HashMultiset<>(1.0, 2.0, 3.0, 2.0, 5.0);
         Multiset<Double> b = new HashMultiset<>(1.0, 1.0, 2.5);
@@ -35,7 +36,7 @@ public class MongeElkanSimilarityTest {
     }
 
     @Test
-    public void testSimilarity2() {
+    public void testDistance2() {
         MongeElkanDistance<Sequence> distance = new MongeElkanDistance<>(new EditDistance(0, 1, 1));
         assertThat(distance.getDistance(ReadsBag.fromString("ATC", "ATG"), ReadsBag.fromString("ATA")), is(closeTo(1.0, 1e-10)));
         assertThat(distance.getDistance(ReadsBag.fromString("ATA"), ReadsBag.fromString("GCA")), is(closeTo(2.0, 1e-10)));
@@ -43,7 +44,7 @@ public class MongeElkanSimilarityTest {
     }
 
     @Test
-    public void testSimilarity3() {
+    public void testDistance3() {
         MongeElkanDistance<Sequence> distance = new MongeElkanDistance<>(new EditDistance(0, 1, 1));
         assertThat(distance.getDistance(ReadsBag.fromString("ATA", "ATC", "ATG"), ReadsBag.fromString("ATA")), is(closeTo(2.0 / 3.0, 1e-10)));
         assertThat(distance.getDistance(ReadsBag.fromString("ATA"), ReadsBag.fromString("GCA")), is(closeTo(2.0, 1e-10)));
@@ -51,7 +52,7 @@ public class MongeElkanSimilarityTest {
     }
 
     @Test
-    public void testSimilarity4() {
+    public void testDistance4() {
         // TRIANGLE INEQUALITY IS BROKEN
         MongeElkanDistance<Sequence> distance = new MongeElkanDistance<>(new EditDistance(0, 1, 1));
         final ReadsBag a = ReadsBag.fromString("ATC", "ATC", "GGG");

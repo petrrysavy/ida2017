@@ -14,9 +14,6 @@ public class ReadsBagTest {
 
     private ReadsBag readsBag;
 
-    public ReadsBagTest() {
-    }
-
     @Before
     public void bootstrap() {
         this.readsBag = new ReadsBag(10, "A test reads bag.");

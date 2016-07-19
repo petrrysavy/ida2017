@@ -53,16 +53,16 @@ public class SymmetricMongeElkanDistance<T> extends AbstractMongeElkan<T> {
             }
 
         // now calculate the distance from multiset a to multiset b
-        double similarityA = 0.0;
+        double distanceA = 0.0;
         for (int i = 0; i < rowMin.length; i++)
-            similarityA += rowMin[i] * a.count(aList.get(i));
+            distanceA += rowMin[i] * a.count(aList.get(i));
         // and the other way from b to a
-        double similarityB = 0.0;
+        double distanceB = 0.0;
         for (int j = 0; j < colMin.length; j++)
-            similarityB += colMin[j] * b.count(bList.get(j));
+            distanceB += colMin[j] * b.count(bList.get(j));
 
         // and use formula (5)
-        return MathUtils.average(similarityA / a.size(), similarityB / b.size());
+        return MathUtils.average(distanceA / a.size(), distanceB / b.size());
     }
 
     /**

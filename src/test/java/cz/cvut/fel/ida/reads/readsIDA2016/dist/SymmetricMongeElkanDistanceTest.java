@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 public class SymmetricMongeElkanDistanceTest {
 
     @Test
-    public void testGetSimilarity() {
+    public void testGetDistance() {
         SymmetricMongeElkanDistance<Double> instance = new SymmetricMongeElkanDistance<>((Double a, Double b) -> 1.0 - Math.exp(-Math.abs(a - b)));
         Multiset<Double> a = new HashMultiset<>(1.0, 2.0, 3.0, 2.0, 5.0);
         Multiset<Double> b = new HashMultiset<>(1.0, 1.0, 2.5);
@@ -25,21 +25,21 @@ public class SymmetricMongeElkanDistanceTest {
     }
 
     @Test
-    public void testSimilarity4() {
+    public void testDistance4() {
         // TRIANGLE INEQUALITY IS BROKEN
-        SymmetricMongeElkanDistance<Sequence> similarity = new SymmetricMongeElkanDistance<>(new EditDistance(0, 1, 1));
+        SymmetricMongeElkanDistance<Sequence> distance = new SymmetricMongeElkanDistance<>(new EditDistance(0, 1, 1));
         final ReadsBag a = ReadsBag.fromString("ATC", "ATC", "GGG");
         final ReadsBag b = ReadsBag.fromString("ATA", "GGG");
         final ReadsBag c = ReadsBag.fromString("CTA", "GGG");
-        assertThat(similarity.getDistance(a, b), is(closeTo(7.0 / 12.0, 1e-10)));
-        assertThat(similarity.getDistance(b, c), is(closeTo(0.5, 1e-10)));
-        assertThat(similarity.getDistance(a, c), is(closeTo(14.0 / 12.0, 1e-10)));
-        assertThat(similarity.getDistance(a, b) + similarity.getDistance(b, c), is(lessThan(similarity.getDistance(a, c))));
+        assertThat(distance.getDistance(a, b), is(closeTo(7.0 / 12.0, 1e-10)));
+        assertThat(distance.getDistance(b, c), is(closeTo(0.5, 1e-10)));
+        assertThat(distance.getDistance(a, c), is(closeTo(14.0 / 12.0, 1e-10)));
+        assertThat(distance.getDistance(a, b) + distance.getDistance(b, c), is(lessThan(distance.getDistance(a, c))));
     }
 
     @Test
     public void testIsSymmetric() {
-        SymmetricMongeElkanDistance<Sequence> similarity = new SymmetricMongeElkanDistance<>(new EditDistance(0, 1, 1));
-        assertThat(similarity.isSymmetric(), is(true));
+        SymmetricMongeElkanDistance<Sequence> distance = new SymmetricMongeElkanDistance<>(new EditDistance(0, 1, 1));
+        assertThat(distance.isSymmetric(), is(true));
     }
 }

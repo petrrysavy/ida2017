@@ -12,9 +12,6 @@ import static org.junit.Assert.*;
  */
 public class ProductDistanceTest {
 
-    public ProductDistanceTest() {
-    }
-
     @Test
     public void testGetDistance() {
         assertThat(new ProductDistance<>(new ConstDistance(0.0), new ConstDistance(0.0)).getDistance(0, 0), is(equalTo(0.0)));

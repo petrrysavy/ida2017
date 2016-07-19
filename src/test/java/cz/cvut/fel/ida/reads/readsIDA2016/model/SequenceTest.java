@@ -15,9 +15,6 @@ public class SequenceTest {
 
     private Sequence sequence;
 
-    public SequenceTest() {
-    }
-
     @Before
     public void bootstrap() {
         this.sequence = new Sequence("ATCGCCTTAG".toCharArray(), "A test sequence");

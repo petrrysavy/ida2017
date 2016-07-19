@@ -11,9 +11,6 @@ import static org.junit.Assert.*;
  */
 public class ArrayUtilsTest {
 
-    public ArrayUtilsTest() {
-    }
-
     @Test
     public void testNTimes() {
         assertThat(ArrayUtils.nTimes(0.0, 0), is(equalTo(new double[]{})));

@@ -11,9 +11,6 @@ import static org.junit.Assert.assertThat;
  */
 public class MathUtilsTest {
 
-    public MathUtilsTest() {
-    }
-
     @Test
     public void testMin_Int() {
         assertThat(MathUtils.min(1, 2, 3), is(equalTo(1)));
