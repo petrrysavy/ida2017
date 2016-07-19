@@ -1,14 +1,14 @@
 package cz.cvut.fel.ida.reads.readsIDA2016.dist;
 
 import cz.cvut.fel.ida.reads.readsIDA2016.model.Sequence;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 /**
- *
  * @author Petr Ryšavý
  */
 public class EditDistanceTest {

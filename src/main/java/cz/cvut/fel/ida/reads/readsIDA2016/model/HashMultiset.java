@@ -10,86 +10,127 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * An implementation of multiset that uses a hash map. The map stores objects as
+ * keys and counts as values.
  *
  * @author Petr Ryšavý
- * @param <T>
+ * @param <T> The type of objects stored in the multiset.
  */
-public class HashMultiset<T> extends AbstractMultiset<T> implements Cloneable
-{
+public class HashMultiset<T> extends AbstractMultiset<T> implements Cloneable {
+
+    /** This map holds the state of the multiset. */
     private HashMap<T, Integer> map;
 
+    /** Size of this multiset. */
     private int size = 0;
 
-    public HashMultiset()
-    {
+    /** Constructs an empty multiset. */
+    public HashMultiset() {
         map = new HashMap<>();
     }
 
-    public HashMultiset(Collection<T> initialElements)
-    {
+    /** Constructs an empty multiset and fills it with all elements form the
+     * collection.
+     *
+     * @param initialElements Elements to fill the collection with. */
+    public HashMultiset(Collection<T> initialElements) {
         this(initialElements.size());
         addAll(initialElements);
     }
 
-    public HashMultiset(int initialCapacity)
-    {
+    /**
+     * Constructs an empty multiset with selected initial capacity of the
+     * backing hash map.
+     *
+     * @param initialCapacity The initial capacity.
+     */
+    public HashMultiset(int initialCapacity) {
         map = new HashMap<>(initialCapacity);
     }
 
-    public HashMultiset(int initialCapacity, float loadFactor)
-    {
+    /**
+     * Constructs a new multiset with selected initial capapcity and load
+     * factor.
+     *
+     * @param initialCapacity The initial capacity of the map.
+     * @param loadFactor      Load factor of the map. Growing the map does not
+     *                        depend on duplicates.
+     */
+    public HashMultiset(int initialCapacity, float loadFactor) {
         map = new HashMap<>(initialCapacity, loadFactor);
     }
 
-    public HashMultiset(T ... elements) {
+    /**
+     * Creates an empty multiset and fills it with the elements from the
+     * parameter list.
+     *
+     * @param elements Elements to put into the multiset.
+     */
+    public HashMultiset(T... elements) {
         this(elements.length);
         addAll(Arrays.asList(elements));
     }
 
+    /**
+     * Constructs a new iterator. The iterator iterates over all element
+     * including the duplicates.
+     *
+     * @return The iterator.
+     */
     @Override
-    public Iterator<T> iterator()
-    {
+    public Iterator<T> iterator() {
         return new MultisetIterator();
     }
 
+    /**
+     * {@inheritDoc }
+     * Returns number of elements in this multiset including duplicates.
+     *
+     * @return The number of elements in the multiset.
+     */
     @Override
-    public int size()
-    {
+    public int size() {
         return size;
     }
 
+    /** {@inheritDoc }
+     * This implementation sets the size to zero and clears the backing hash
+     * map.
+     */
     @Override
-    public void clear()
-    {
+    public void clear() {
         size = 0;
         map.clear();
     }
 
+    /**
+     * {@inheritDoc} This implementation removes a single occurence of the
+     * object.
+     */
     @Override
     @SuppressWarnings({"unchecked", "element-type-mismatch"})
-    public boolean remove(Object o)
-    {
+    public boolean remove(Object o) {
         Integer count = count(o);
         if (count == 0)
             return false;
 
         size--;
-        if(count > 1)
+        if (count > 1)
             map.put((T) o, count - 1);
         else
             map.remove(o);
         return true;
     }
 
+    /** {@inheritDoc} Adds a single instance of the object to the multiset. */
     @Override
-    public boolean add(T e)
-    {
+    public boolean add(T e) {
         return add(e, 1);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public boolean add(T e, int count)
-    {
+    public boolean add(T e, int count) {
         if (count <= 0)
             throw new IllegalArgumentException("Illegal count: " + count);
 
@@ -100,24 +141,24 @@ public class HashMultiset<T> extends AbstractMultiset<T> implements Cloneable
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public Set<T> toSet()
-    {
+    public Set<T> toSet() {
         return new HashSet<>(map.keySet());
     }
 
+    /** {@inheritDoc} */
     @Override
-    public HashMultiset<T> union(Multiset<T> other)
-    {
+    public HashMultiset<T> union(Multiset<T> other) {
         HashMultiset<T> copy = this.clone();
         for (T elem : other.toSet())
             copy.add(elem, other.count(elem));
         return copy;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public int count(Object o)
-    {
+    public int count(Object o) {
         @SuppressWarnings("element-type-mismatch")
         Integer count = map.get(o);
         if (count == null)
@@ -125,16 +166,18 @@ public class HashMultiset<T> extends AbstractMultiset<T> implements Cloneable
         return count;
     }
 
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("element-type-mismatch")
-    public boolean contains(Object o)
-    {
+    public boolean contains(Object o) {
         return map.containsKey(o);
     }
 
+    /** {@inheritDoc} Two multisets are equal iff they contain the same elements
+     * and all the elements have the same counts in both collections.
+     */
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -143,59 +186,64 @@ public class HashMultiset<T> extends AbstractMultiset<T> implements Cloneable
             return false;
         final HashMultiset<?> other = (HashMultiset<?>) obj;
         // the sizes of the maps may be equal, but this may be still violated
-        if(this.size != other.size)
+        if (this.size != other.size)
             return false;
         return Objects.equals(this.map, other.map);
     }
 
+    /** {@inheritDoc }
+     * Hash code of the backing hash map.
+     */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return map.hashCode();
     }
 
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("CloneDeclaresCloneNotSupported")
-    protected HashMultiset<T> clone()
-    {
-        try
-        {
+    protected HashMultiset<T> clone() {
+        try {
             @SuppressWarnings("unchecked")
             HashMultiset<T> copy = (HashMultiset<T>) super.clone();
             copy.size = size;
             copy.map = (HashMap<T, Integer>) map.clone();
             return copy;
-        }
-        catch (CloneNotSupportedException ex)
-        {
+        } catch (CloneNotSupportedException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private class MultisetIterator implements Iterator<T>
-    {
+    /** A multiset iterator that wraps iterator of the backing hash map. */
+    private class MultisetIterator implements Iterator<T> {
+
+        /** Iterator of the hash map. */
         private final Iterator<Entry<T, Integer>> iterator = map.entrySet().iterator();
+        /** Current entry. */
         private Entry<T, Integer> current = null;
+        /** How many times we have returned an element of the current entry. */
         private int count = 0;
 
+        /** {@inheritDoc} */
         @Override
-        public boolean hasNext()
-        {
+        public boolean hasNext() {
             return iterator.hasNext() || (current != null && count < current.getValue());
         }
 
+        /** {@inheritDoc} */
         @Override
-        public T next()
-        {
+        public T next() {
+            // this happens only after the first call.
             if (current == null)
                 current = iterator.next();
 
-            if (current.getValue() <= count)
-            {
+            // we cannot return the current element anymore, look for the next entry in the map
+            if (current.getValue() <= count) {
                 current = iterator.next();
                 count = 0;
             }
 
+            // increase count and return key
             count++;
             return current.getKey();
         }

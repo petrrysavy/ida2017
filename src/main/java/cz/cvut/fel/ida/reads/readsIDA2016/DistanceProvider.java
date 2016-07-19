@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.cvut.fel.ida.reads.readsIDA2016;
 
 import cz.cvut.fel.ida.reads.readsIDA2016.dist.Distance;
@@ -19,53 +14,131 @@ import cz.cvut.fel.ida.reads.readsIDA2016.model.ReadsBag;
 import cz.cvut.fel.ida.reads.readsIDA2016.model.Sequence;
 
 /**
+ * This class provides static methods that instantiate {@link Distance}
+ * implementations used in the paper. This is the simplest way how to obtain
+ * implementation of the methods tested in the paper.
  *
  * @author Petr Ryšavý
  */
 public class DistanceProvider {
 
+    /** Length of read. It is assumed that this is constant. */
     private final int readLength;
+    /** Coverage is average number of reads that cover a particular position in
+     * the true sequence. Denoted {@code alpha} in the paper. It is assumed that
+     * this is constant. */
     private final int coverage;
+    /** Threshold for missing read detection. See Sect. 2.4. */
     private final double thetaPrime;
 
+    /**
+     * Constructs new instance of this class.
+     *
+     * @param readLength Length of read.
+     * @param coverage   Coverage is average number of reads that cover a
+     *                   particular position in the true sequence.
+     * @param thetaPrime Threshold for missing read detection.
+     */
     public DistanceProvider(int readLength, int coverage, double thetaPrime) {
         this.readLength = readLength;
         this.coverage = coverage;
         this.thetaPrime = thetaPrime;
     }
 
+    /**
+     * Constructs implementation of Levenshtein distance used in the
+     * experiments. Implementation uses standard Fischer-Wagner dynamic
+     * programming algorithm with linear memory requirements and qudratic time
+     * requirements.
+     *
+     * @return The Levenshtein distance.
+     */
     public Distance<Sequence> getLevenshteinDistance() {
         return new EditDistance();
     }
-    
+
+    /**
+     * Constructs implementation of Levenshtein distance that does not penalize
+     * margin gaps. See Sect. 2.3. This is part of {@code Dist_MESSG}.
+     *
+     * @return Levenshtein distance that does not penalize margin gaps.
+     */
     public Distance<Sequence> getGraceMarginLevenshteinDistance() {
         return new EditDistanceGraceMargin(0, 1, 1, new LinearMarginPenalty(0.5 * ((double) readLength / coverage - 1.0), 2.0));
     }
-    
+
+    /**
+     * A modification to the {@link #getGraceMarginLevenshteinDistance()}. If
+     * the distance is greater than threshold set in this class, the inputs are
+     * considered different. See Sect. 2.4.
+     *
+     * @return Levenshtein distance that does not penaliye margin gaps and
+     *         implements a threshold.
+     */
     public Distance<Sequence> getThresholdedDistance() {
         return new DistanceThreshold<>(getGraceMarginLevenshteinDistance(), thetaPrime * readLength, readLength);
     }
-    
+
+    /**
+     * Returns an implementation of distance that provides scaled upper bound on
+     * distance between two read bags. It is defined by
+     * {@code Dist(RA, RB) = max(|RA|, |RB|)} This is used as baseline in the
+     * paper.
+     *
+     * @return Distance that returns size of the bigger reads bag.
+     */
     public Distance<ReadsBag> getMaxSizeDistance() {
         return new MaxSizeDistance();
     }
 
+    /**
+     * Returns Monge-Elkan distance. See equation (4) in the paper.
+     *
+     * @return The Monge-Elkan distance.
+     */
     public Distance<ReadsBag> getDistME() {
         return new MultisetAsReadsBagDistanceAdapter(new MongeElkanDistance<>(getLevenshteinDistance()));
     }
 
+    /**
+     * Returns a symmetric version of the Monge-Elkan distance. See equation (5)
+     * in the paper.
+     *
+     * @return Symmetric version of the Monge-Elkan distance.
+     */
     public Distance<ReadsBag> getDistMES() {
         return new MultisetAsReadsBagDistanceAdapter(new SymmetricMongeElkanDistance<>(getLevenshteinDistance()));
     }
 
+    /**
+     * Returns Monge-Elkan distance that is denormalized. See euqation (6) in
+     * the paper.
+     *
+     * @return Scaled Monge-Elkan distance.
+     */
     public Distance<ReadsBag> getDistMESS() {
         return new ProductDistance<>(new MultisetAsReadsBagDistanceAdapter(new SymmetricMongeElkanDistance<>(getLevenshteinDistance())), getMaxSizeDistance());
     }
 
+    /**
+     * Returns Monge-Elkan distance that does not penalize margin gaps. See
+     * Sect. 2.3 in the paper.
+     *
+     * @return Monge-Elkan distance that does not penalize margin gaps of the
+     *         reads.
+     * @see #getGraceMarginLevenshteinDistance()
+     */
     public Distance<ReadsBag> getDistMESSG() {
         return new ProductDistance<>(new MultisetAsReadsBagDistanceAdapter(new SymmetricMongeElkanDistance<>(getGraceMarginLevenshteinDistance())), getMaxSizeDistance());
     }
-    
+
+    /**
+     * Returns Monge-Elkan distance with missing read detection. See Sect. 2.4
+     * in the paper.
+     *
+     * @return Monge-Elkan distance with missing read detection.
+     * @see #getThresholdedDistance()
+     */
     public Distance<ReadsBag> getDistMESSGM() {
         return new ProductDistance<>(new MultisetAsReadsBagDistanceAdapter(new SymmetricMongeElkanDistance<>(getThresholdedDistance())), getMaxSizeDistance());
     }

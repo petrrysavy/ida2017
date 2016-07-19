@@ -4,24 +4,20 @@ import cz.cvut.fel.ida.reads.readsIDA2016.model.HashMultiset;
 import cz.cvut.fel.ida.reads.readsIDA2016.model.Multiset;
 import cz.cvut.fel.ida.reads.readsIDA2016.model.ReadsBag;
 import cz.cvut.fel.ida.reads.readsIDA2016.model.Sequence;
-import org.hamcrest.CoreMatchers;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import org.hamcrest.number.IsCloseTo;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 /**
- *
  * @author Petr Ryšavý
  */
 public class MongeElkanSimilarityTest {
 
-    /**
-     * Test of getSimilarity method, of class MongeElkanDistance.
-     */
     @Test
     public void testGetSimilarity() {
         MongeElkanDistance instance = new MongeElkanDistance<>((Double a, Double b) -> 1.0 - Math.exp(-Math.abs(a - b)));
@@ -30,9 +26,6 @@ public class MongeElkanSimilarityTest {
         assertThat(instance.getDistance(a, b), is(closeTo(1.0 - 0.5803353955523598132, 1e-11)));
     }
 
-    /**
-     * Test of getSimilarity method, of class MongeElkanDistance.
-     */
     @Test
     public void testGetSimilarity2() {
         MongeElkanDistance instance = new MongeElkanDistance<>((Double a, Double b) -> 1.0 - Math.exp(-Math.abs(a - b)));

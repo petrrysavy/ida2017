@@ -1,14 +1,15 @@
 package cz.cvut.fel.ida.reads.readsIDA2016.dist;
 
 import cz.cvut.fel.ida.reads.readsIDA2016.model.Sequence;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.closeTo;
+import static org.junit.Assert.assertThat;
+
 /**
- *
  * @author Petr Ryšavý
  */
 public class EditDistanceGraceMarginTest {
@@ -20,11 +21,10 @@ public class EditDistanceGraceMarginTest {
         editDistance = new EditDistanceGraceMargin(0, 1, 1, (int distanceFromEnd, int wordLength) -> {
             switch (distanceFromEnd) {
                 case 0:
-                case 1:
                     return 0;
-                case 2:
+                case 1:
                     return 1;
-                case 3:
+                case 2:
                     return 2;
                 default:
                     throw new RuntimeException();
@@ -35,6 +35,18 @@ public class EditDistanceGraceMarginTest {
     @Test
     public void testGetDistance1() {
         assertThat(editDistance.getDistance(Sequence.fromString("ABC"), Sequence.fromString("CDA")), is(equalTo(2.0)));
+    }
+
+    @Test
+    public void testGetDistance5() {
+        editDistance = new EditDistanceGraceMargin(0, 1, 1, new LinearMarginPenalty(2, 2));
+        assertThat(editDistance.getDistance(Sequence.fromString("ABCDEF"), Sequence.fromString("DEFGHI")), is(closeTo(4.0 / 3.0, 1e-10)));
+    }
+
+    @Test
+    public void testGetDistance6() {
+        editDistance = new EditDistanceGraceMargin(0, 1, 1, new LinearMarginPenalty(2, 2));
+        assertThat(editDistance.getDistance(Sequence.fromString("ABCDEF"), Sequence.fromString("EFGHIJ")), is(closeTo(4.0, 1e-10)));
     }
 
     @Test
@@ -71,7 +83,7 @@ public class EditDistanceGraceMarginTest {
         });
         assertThat(editDistance.getDistance(Sequence.fromString("TCGC"), Sequence.fromString("CGCT")), is(equalTo(0.0)));
     }
-    
+
     @Test
     public void testSymmetric() {
         assertThat(editDistance.isSymmetric(), is(true));

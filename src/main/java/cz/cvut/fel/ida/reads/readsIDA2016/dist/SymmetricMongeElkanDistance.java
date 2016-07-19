@@ -7,24 +7,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This class implements a symmetric version of Monge-Elkan distance. This is
+ * obtained from Monge-Elkan distance by averaging the two directions, i.e. it
+ * is equal to 1/2(dist(RA, RB) + dist(RB, RA)). See equation (5) in the paper.
+ *
+ * This class does not implement equation (5) directly, but avoids duplicate
+ * distance calculations at cost of linear memory requirement in size of both
+ * multisets.
  *
  * @author Petr Ryšavý
- * @param <T>
+ * @param <T> Type of objects in compared multisets.
+ * @see MongeElkanDistance
  */
 public class SymmetricMongeElkanDistance<T> extends AbstractMongeElkan<T> {
 
+    /** Creates new instance of this class.
+     *
+     * @param innerDistance The distance measure that is used inside the
+     *                      Monge-Elkan distance. See dist in equation (4).
+     */
     public SymmetricMongeElkanDistance(Distance<T> innerDistance) {
         super(innerDistance);
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return Symmetric version of Monge-Elkan distance as defined by (5).
+     */
     @Override
     public double getDistance(Multiset<T> a, Multiset<T> b) {
         final List<T> aList = new ArrayList<>(a.toSet());
         final List<T> bList = new ArrayList<>(b.toSet());
 
+        // instead of distance matrix, we will remember only minimum in each row & col
         final double[] rowMin = ArrayUtils.nTimes(Double.MAX_VALUE, aList.size());
         final double[] colMin = ArrayUtils.nTimes(Double.MAX_VALUE, bList.size());
 
+        // iterate over all pairs of objects, compare them and remember if minimal
         for (int i = 0; i < rowMin.length; i++)
             for (int j = 0; j < colMin.length; j++) {
                 final double dist = innerDistance.getDistance(aList.get(i), bList.get(j));
@@ -32,18 +52,26 @@ public class SymmetricMongeElkanDistance<T> extends AbstractMongeElkan<T> {
                 colMin[j] = Math.min(colMin[j], dist);
             }
 
+        // now calculate the distance from multiset a to multiset b
         double similarityA = 0.0;
         for (int i = 0; i < rowMin.length; i++)
             similarityA += rowMin[i] * a.count(aList.get(i));
+        // and the other way from b to a
         double similarityB = 0.0;
         for (int j = 0; j < colMin.length; j++)
             similarityB += colMin[j] * b.count(bList.get(j));
 
+        // and use formula (5)
         return MathUtils.average(similarityA / a.size(), similarityB / b.size());
     }
 
+    /**
+     * This version of Monge-Elkan distance is symmetric.
+     *
+     * @return {@code true}.
+     */
     @Override
-    public boolean isZeroOneNormalized() {
-        return innerDistance.isZeroOneNormalized();
+    public boolean isSymmetric() {
+        return true;
     }
 }

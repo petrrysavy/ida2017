@@ -1,12 +1,12 @@
 package cz.cvut.fel.ida.reads.readsIDA2016.util;
 
+import org.junit.Test;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.junit.Test;
 
 /**
- *
  * @author Petr Ryšavý
  */
 public class MathUtilsTest {
@@ -33,7 +33,7 @@ public class MathUtilsTest {
         assertThat(MathUtils.min(3.0, 2.0, 1.0), is(equalTo(1.0)));
         assertThat(MathUtils.min(3.0, 1.0, 2.0), is(equalTo(1.0)));
     }
-    
+
     @Test
     public void testAverage() {
         assertThat(MathUtils.average(0.0, 0.0), is(equalTo(0.0)));

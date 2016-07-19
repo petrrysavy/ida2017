@@ -1,12 +1,12 @@
 package cz.cvut.fel.ida.reads.readsIDA2016.util;
 
+import org.junit.Test;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
-import org.junit.Test;
 
 /**
- *
  * @author Petr Ryšavý
  */
 public class ArrayUtilsTest {

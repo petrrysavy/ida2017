@@ -1,13 +1,13 @@
 package cz.cvut.fel.ida.reads.readsIDA2016.dist;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.closeTo;
+import static org.junit.Assert.assertThat;
+
 /**
- *
  * @author Petr Ryšavý
  */
 public class DistanceThresholdTest {

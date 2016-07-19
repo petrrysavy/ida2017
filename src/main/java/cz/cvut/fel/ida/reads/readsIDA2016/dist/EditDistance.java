@@ -4,29 +4,50 @@ import cz.cvut.fel.ida.reads.readsIDA2016.model.Sequence;
 import cz.cvut.fel.ida.reads.readsIDA2016.util.MathUtils;
 
 /**
+ * Implementation of the edit distance between the sequences. This code uses
+ * implementation of Wagner-Fischer algorithm.
+ *
+ * For more details refer to: Wagner, Robert A., and Michael J. Fischer. "The
+ * string-to-string correction problem." Journal of the ACM (JACM) 21.1 (1974):
+ * 168-173.
  *
  * @author Petr Ryšavý
  */
-public class EditDistance implements Distance<Sequence>
-{
+public class EditDistance implements Distance<Sequence> {
+
+    /** Premium for matching characters. */
     private final int matchPremium;
+    /** This is cost for editing a letter. */
     private final int mismatchPenalty;
+    /** This is cost for delete and insert operation. */
     private final int gapPenalty;
-    
+
+    /** Constructs new object of this class as Levenshtein distance. */
     public EditDistance() {
         this(0, 1, 1);
     }
 
-    public EditDistance(int matchPremium, int mismatchPenalty, int gapPenalty)
-    {
+    /**
+     * Constructs new edit distance object based on the costs.
+     *
+     * @param matchPremium    Premium for matching characters.
+     * @param mismatchPenalty This is cost for editing a letter.
+     * @param gapPenalty      This is cost for delete and insert operation.
+     */
+    public EditDistance(int matchPremium, int mismatchPenalty, int gapPenalty) {
         this.matchPremium = matchPremium;
         this.mismatchPenalty = mismatchPenalty;
         this.gapPenalty = gapPenalty;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return Calculates the cost based on number of insert, edit and delete
+     *         operations to turn one string into the other.
+     */
     @Override
-    public double getDistance(Sequence a, Sequence b)
-    {
+    public double getDistance(Sequence a, Sequence b) {
         final char[] aSeq = a.getSequence();
         final char[] bSeq = b.getSequence();
         // create emty table, first string in rows, second to the columns
@@ -38,17 +59,16 @@ public class EditDistance implements Distance<Sequence>
         for (int j = 0; j < bSeq.length; j++)
             scoreMatrixLast[j + 1] = scoreMatrixLast[j] + gapPenalty;
         // fill the rest of the table
-        for (int i = 0; i < aSeq.length; i++)
-        { // i goes over rows, i.e. the first word
+        for (int i = 0; i < aSeq.length; i++) { // i goes over rows, i.e. the first word
             scoreMatrixCurrent[0] = scoreMatrixLast[0] + gapPenalty;
             for (int j = 0; j < bSeq.length; j++)
                 scoreMatrixCurrent[j + 1] = MathUtils.min(
-                    // look to the left
-                    scoreMatrixCurrent[j] + gapPenalty,
-                    // look to the top
-                    scoreMatrixLast[j + 1] + gapPenalty,
-                    // try the diagonal
-                    scoreMatrixLast[j] + (aSeq[i] == bSeq[j] ? -matchPremium : mismatchPenalty));
+                        // look to the left
+                        scoreMatrixCurrent[j] + gapPenalty,
+                        // look to the top
+                        scoreMatrixLast[j + 1] + gapPenalty,
+                        // try the diagonal
+                        scoreMatrixLast[j] + (aSeq[i] == bSeq[j] ? -matchPremium : mismatchPenalty));
 
             // swap the score matrix line
             swap = scoreMatrixCurrent;
