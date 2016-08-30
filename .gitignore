@@ -14,3 +14,5 @@ hs_err_pid*
 # ignore the maven target folder
 target
 /nbproject/
+licenseheader.txt
+nb-configuration.xml
