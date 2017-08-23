@@ -36,12 +36,25 @@ public final class ArrayUtils {
      * Creates new double array that contains {@code n}-times {@code value}.
      *
      * @param value The value that should be in the array.
-     * @param n     Length of the desired array.
+     * @param n Length of the desired array.
      * @return Array that contains {@code n}-times {@code value}.
      */
     public static double[] nTimes(double value, int n) {
         final double[] arr = new double[n];
         Arrays.fill(arr, value);
         return arr;
+    }
+
+    /**
+     * Creates a copy of the array that contains values from the last character
+     * to the first character.
+     * @param arr Array to be reversed.
+     * @return Copy of {@code arr} with elements from the end to the beginning.
+     */
+    public static char[] reversedCopy(char[] arr) {
+        final char[] reversed = new char[arr.length];
+        for (int i = 0; i < arr.length; i++)
+            reversed[i] = arr[arr.length - i - 1];
+        return reversed;
     }
 }

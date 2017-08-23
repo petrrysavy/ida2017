@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2016 Petr Rysavy <rysavpe1@fel.cvut.cz>
+ * Copyright (c) 2016 Petr Rysavy <petr.rysavy@fel.cvut.cz>
  *
- * This file is part of the project readsIDA2016, which is available on 
- * <https://github.com/petrrysavy/readsIDA2016/>.
+ * This file is part of the project ida2017, which is available on 
+ * <https://github.com/petrrysavy/ida2017>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,12 @@ import cz.cvut.fel.ida.reads.readsIDA2016.dist.MongeElkanDistance;
 import cz.cvut.fel.ida.reads.readsIDA2016.dist.MultisetAsReadsBagDistanceAdapter;
 import cz.cvut.fel.ida.reads.readsIDA2016.dist.ProductDistance;
 import cz.cvut.fel.ida.reads.readsIDA2016.dist.SymmetricMongeElkanDistance;
+import cz.cvut.fel.ida.reads.readsIDA2016.model.ContigSet;
 import cz.cvut.fel.ida.reads.readsIDA2016.model.ReadsBag;
 import cz.cvut.fel.ida.reads.readsIDA2016.model.Sequence;
+import cz.cvut.fel.ida.reads.readsIDA2017.contigdist.ContigDistance;
+import cz.cvut.fel.ida.reads.readsIDA2017.contigdist.OverlapFinder;
+import cz.cvut.fel.ida.reads.readsIDA2017.contigdist.OverlapDistance;
 
 /**
  * This class provides static methods that instantiate {@link Distance}
@@ -54,8 +58,8 @@ public class DistanceProvider {
      * Constructs new instance of this class.
      *
      * @param readLength Length of read.
-     * @param coverage   Coverage is average number of reads that cover a
-     *                   particular position in the true sequence.
+     * @param coverage Coverage is average number of reads that cover a
+     * particular position in the true sequence.
      * @param thetaPrime Threshold for missing read detection.
      */
     public DistanceProvider(int readLength, int coverage, double thetaPrime) {
@@ -92,7 +96,7 @@ public class DistanceProvider {
      * considered different. See Sect. 2.4.
      *
      * @return Levenshtein distance that does not penaliye margin gaps and
-     *         implements a threshold.
+     * implements a threshold.
      */
     public Distance<Sequence> getThresholdedDistance() {
         return new DistanceThreshold<>(getGraceMarginLevenshteinDistance(), thetaPrime * readLength, readLength);
@@ -144,7 +148,7 @@ public class DistanceProvider {
      * Sect. 2.3 in the paper.
      *
      * @return Monge-Elkan distance that does not penalize margin gaps of the
-     *         reads.
+     * reads.
      * @see #getGraceMarginLevenshteinDistance()
      */
     public Distance<ReadsBag> getDistMESSG() {
@@ -160,5 +164,19 @@ public class DistanceProvider {
      */
     public Distance<ReadsBag> getDistMESSGM() {
         return new ProductDistance<>(new MultisetAsReadsBagDistanceAdapter(new SymmetricMongeElkanDistance<>(getThresholdedDistance())), getMaxSizeDistance());
+    }
+
+    /**
+     * Returns distance that calculates similarity of contig sets. See paper
+     * "Estimatig Sequence Similarity from Contig Sets" by Petr Ryšavý and Filip
+     * Železný.
+     * @param orientationUnknown Consider that we do not know whether the
+     * contigs go from 5 to 3 end.
+     * @param strandUnknown We do not know whether all contigs come from the
+     * same strand.
+     * @return Distance to calculate similarity of contig sets.
+     */
+    public Distance<ContigSet> getContigDist(boolean orientationUnknown, boolean strandUnknown) {
+        return new ContigDistance(new OverlapDistance(new OverlapFinder(20), orientationUnknown, strandUnknown), readLength, coverage);
     }
 }

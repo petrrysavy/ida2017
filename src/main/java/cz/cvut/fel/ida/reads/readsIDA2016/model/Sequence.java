@@ -19,6 +19,8 @@
  */
 package cz.cvut.fel.ida.reads.readsIDA2016.model;
 
+import cz.cvut.fel.ida.reads.readsIDA2016.util.ArrayUtils;
+import cz.cvut.fel.ida.reads.readsIDA2016.util.Nucleotides;
 import java.util.Arrays;
 
 /**
@@ -36,7 +38,7 @@ public class Sequence implements CharSequence {
     /**
      * Creates new sequence.
      *
-     * @param sequence    The sequence to be stored.
+     * @param sequence The sequence to be stored.
      * @param description Description of the sequence. Can be {@code null}.
      */
     public Sequence(char[] sequence, String description) {
@@ -48,7 +50,7 @@ public class Sequence implements CharSequence {
      * Returns the character array representation of this sequence.
      *
      * @return Array that contains this sequence. Note that possible changes
-     *         will propagate to this class.
+     * will propagate to this class.
      */
     public char[] getSequence() {
         return sequence;
@@ -92,17 +94,44 @@ public class Sequence implements CharSequence {
      * Constructs a sequence from string representation.
      *
      * @param string String that will form the newly created sequence. It will
-     *               be used as description too.
+     * be used as description too.
      * @return Sequence from the given string.
      */
     public static Sequence fromString(String string) {
         return new Sequence(string.toCharArray(), string);
     }
 
+    /**
+     * Gets the reverse sequence.
+     * @return Sequence with nucleotides from the last symbol to the first one.
+     */
+    public Sequence reverse() {
+        return new Sequence(ArrayUtils.reversedCopy(sequence), description + ", reversed");
+    }
+
+    /**
+     * Gets the complementary sequence.
+     * @return Sequence with nucleotides replaced by their complementary
+     * nucleotides.
+     */
+    public Sequence complement() {
+        return new Sequence(Nucleotides.complementaryCopy(sequence), description + ", complement");
+    }
+
+    /**
+     * Gets the complementary reversed sequence. This is how would looks
+     * sequence look like if it was read from the complementary strand.
+     * @return Sequence with nucleotides replaced by their complementary
+     * nucleotides and in reversed order.
+     */
+    public Sequence reverseComplement() {
+        return this.reverse().complement();
+    }
+
     /** {@inheritDoc}
      *
      * @return Description or sequence itself, whatever is shorter. If the
-     *         description is {@code null}, the method returns the sequence.
+     * description is {@code null}, the method returns the sequence.
      */
     @Override
     public String toString() {
