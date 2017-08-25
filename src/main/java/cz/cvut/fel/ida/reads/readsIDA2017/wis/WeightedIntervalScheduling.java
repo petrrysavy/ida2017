@@ -90,9 +90,11 @@ public class WeightedIntervalScheduling {
         final Collection<T> set = new ArrayList<>(intervals.length / 2);
         int i = intervals.length - 1;
         while (i > 0) {
-            if (value[i] != value[i - 1]) { // the last element is included ..
+            final int lastPos = findLast(intervals, intervals[i].getStart());
+            final double valueOfLast = lastPos == -1 ? 0 : value[lastPos];
+            if (value[i] == intervals[i].getValue() + valueOfLast) { // the last element is included ..
                 set.add(intervals[i]);
-                i = findLast(intervals, intervals[i].getStart());
+                i = lastPos;
             } else
                 i--; // just decrease i
         }
